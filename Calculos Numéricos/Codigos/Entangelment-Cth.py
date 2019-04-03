@@ -4,20 +4,24 @@ from numpy import linalg as LA
 
 def Msqrt(M): ### Método de Newton-Raphson de la raiz cuadrada.
     x = M;
-    for i in range(50):
+    e = 1;
+    while(e > 10E-7):
         x = 0.5*x+0.5*np.dot(M,LA.inv(x));
+        e = LA.norm(np.dot(x,x)-M);
     return x   
 
 n = 10000;
-m = 0.1;
-x = np.arange(-np.pi,np.pi,1/n);
+#m = 0.1;
+x = np.zeros(n);
+for i in range(n):
+  x[n-i-1]=np.pi*np.cos((2*i+1)*np.pi/(2*n));
 
 def f(x,k):
-    res = np.cos(k*x)/np.sqrt(m**2+2*(1-np.cos(x)));
+    res = np.cos(k*x)/(4*np.pi*np.sqrt(m**2+2*(1-np.cos(x))));
     return res
 
 def g(x,k):
-    res = np.cos(k*x)*np.sqrt(m**2+2*(1-np.cos(x)));
+    res = np.cos(k*x)*np.sqrt(m**2+2*(1-np.cos(x)))/(4*np.pi);
     return res
 
 def Int(k):
@@ -32,14 +36,14 @@ def Int(k):
 
 res1 = [];
 res2 = [];
-for k in range(700):
+for k in range(50):
     aux1,aux2 = Int(k);
     res1.append(aux1);
     res2.append(aux2);
 
-R = 300;
+R = 50;
 S = [];
-for r in range(2,R):
+for r in range(1,R):
     X = np.zeros((r,r));
     P = np.zeros((r,r));
     for i in range(r):
@@ -50,12 +54,62 @@ for r in range(2,R):
             P[j,i] = P[i,j];
     Cv = Msqrt(np.dot(X,P));
     d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
-    d2 = LA.eigvals(Cv-0.4999999*np.eye(len(Cv)));
+    d2 = LA.eigvals(Cv-0.499999*np.eye(len(Cv)));
     S.append(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2)));
     
-m,b = np.polyfit(range(2,R),S,1);
+#p,o = np.polyfit(range(2,R),S,1);
     
-plt.plot(range(2,R),S,'--')
+plt.plot(range(1,len(S)+1),S,'o-')
 plt.show()
 
-np.savez('EE-cth',res1,res2,S,R,m,x)
+#np.savez('EE-cth-0.1',S,R,m,x)
+Masas = np.linspace(0.01,1,10);
+Sm=[];
+for i in range(len(Masas)):
+  m = Masas[i];
+  R = int(10/Masas[i]);
+  res1 = [];
+  res2 = [];
+  for k in range(R):
+    aux1,aux2 = Int(k);
+    res1.append(aux1);
+    res2.append(aux2);
+  X = np.zeros((R,R));
+  P = np.zeros((R,R));
+  for k in range(R):
+    for j in range(k,R):
+      X[k,j] = res1[j-k];
+      X[j,k] = X[k,j];
+      P[k,j] = res2[j-k];
+      P[j,k] = P[k,j];
+  Cv = Msqrt(np.dot(X,P));
+  d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
+  d2 = LA.eigvals(Cv-0.499999*np.eye(len(Cv)));
+  Sm.append(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2)));
+  
+plt.plot(np.log(Masas),Sm,'o-')
+plt.show()
+
+p,o = np.polyfit(np.log(Masas),Sm,1)
+
+#np.savez('EE-cth-masas',Sm,Masas,x)
+
+m = 10E-10;
+R = 50;
+S = [];
+for r in range(10,R):
+    X = np.zeros((r,r));
+    P = np.zeros((r,r));
+    for i in range(r):
+      for j in range(i,r):
+        X[i,j] = res1[j-i];
+        X[j,i] = X[i,j];
+        P[i,j] = res2[j-i];
+        P[j,i] = P[i,j];
+    Cv = Msqrt(np.dot(X,P));
+    d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
+    d2 = LA.eigvals(Cv-0.499999*np.eye(len(Cv)));
+    S.append(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2)));
+    
+
+    
