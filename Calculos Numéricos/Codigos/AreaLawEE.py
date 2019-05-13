@@ -26,29 +26,29 @@ def f(M,n,l):
     Pv = P[0:n,0:n];
     Xv = X[0:n,0:n];
     Cv = Msqrt(np.dot(Xv,Pv));
-    d = LA.eigvals(Cv);
-    Snl = np.dot(d+0.5*np.ones(n),np.log(d+0.5*np.ones(n)))-np.dot(d-0.5*np.ones(n),np.log(d-0.5*np.ones(n)));
+    d1 = LA.eigvals(Cv+0.5*np.eye(n));
+    d2 = LA.eigvals(Cv-0.5*np.eye(n));
+    Snl = np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2));
     return Snl
 
 
-res1 = [];
-x1 = [];
+res = [];
+x = [];
 M = 100;
 for n in range(1,50):
-    x1.append(n**2);
+    x.append(n**2);
     q = 0;
     for l in range(1000):
         q = q + (2*l+1)*f(M,n,l);
-    res1.append(q);
+    res.append(q);
     
 m,b = np.polyfit(x,res,1);
 
 plt.plot(x,res,'o-')
 plt.show()
-plt.xlabel(r'r^2',fontsize = 16)
+plt.xlabel(r'$r^2$',fontsize = 16)
 plt.title('R = 100, V esfera de radio r',fontsize = 16)
 plt.ylabel(r'$S(\rho_{V})$',fontsize = 16)
 plt.text(600,650, r'S(r) $= cr^2$',fontsize = 16)
 plt.text(600,600,'c = %1.2f'%(m),fontsize = 16)
 
-m,b = np.polyfit(x,res1,1);
