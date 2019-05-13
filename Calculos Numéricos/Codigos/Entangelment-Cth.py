@@ -86,30 +86,53 @@ for i in range(len(Masas)):
   d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
   d2 = LA.eigvals(Cv-0.499999*np.eye(len(Cv)));
   Sm.append(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2)));
-  
-plt.plot(np.log(Masas),Sm,'o-')
-plt.show()
 
 p,o = np.polyfit(np.log(Masas),Sm,1)
+  
+plt.plot(np.log(Masas),Sm,'o-')
+plt.xlabel(r'$Log(m)$',fontsize = 16)
+plt.ylabel(r'S', fontsize = 16)
+plt.text(-2.5,1.4, r'S $\sim clog(m)+const$',fontsize = 16)
+plt.text(-2.5,1.2,'c = %1.4f'%(p),fontsize = 16)
+plt.show()
+
+
 
 #np.savez('EE-cth-masas',Sm,Masas,x)
 
-m = 10E-10;
+m = 10E-7;
 R = 50;
 S = [];
+res1 = [];
+res2 = [];
+for k in range(R):
+    aux1,aux2 = Int(k);
+    res1.append(aux1);
+    res2.append(aux2);
+X = np.zeros((R,R));
+P = np.zeros((R,R));
+for i in range(R):
+  for j in range(i,R):
+    X[i,j] = res1[j-i];
+    X[j,i] = X[i,j];
+    P[i,j] = res2[j-i];
+    P[j,i] = P[i,j];   
 for r in range(10,R):
-    X = np.zeros((r,r));
-    P = np.zeros((r,r));
-    for i in range(r):
-      for j in range(i,r):
-        X[i,j] = res1[j-i];
-        X[j,i] = X[i,j];
-        P[i,j] = res2[j-i];
-        P[j,i] = P[i,j];
-    Cv = Msqrt(np.dot(X,P));
-    d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
-    d2 = LA.eigvals(Cv-0.499999*np.eye(len(Cv)));
-    S.append(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2)));
+  Xv = X[0:r,0:r];
+  Pv = P[0:r,0:r];
+  Cv = Msqrt(np.dot(Xv,Pv));
+  d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
+  d2 = LA.eigvals(Cv-0.499999*np.eye(len(Cv)));
+  S.append(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2)));
     
+p,o = np.polyfit(np.log(range(10,R)),S,1)
+  
+plt.plot(np.log(range(10,R)),S,'o-')
+plt.title(r'$m=10E-7$')
+plt.xlabel(r'$Log(r)$',fontsize = 16)
+plt.ylabel(r'S', fontsize = 16)
+plt.text(2.4,4, r'S $\sim clog(r)+const$',fontsize = 16)
+plt.text(2.4,3.9,'c = %1.4f'%(p),fontsize = 16)
+plt.show()
 
-    
+np.savez('EE-cth-m10-7',S,m,x)
