@@ -11,7 +11,7 @@ def Msqrt(M): ### Método de Newton-Raphson de la raiz cuadrada.
     return x   
 
 x = np.linspace(-np.pi,np.pi,10000);
-m = 1E-4;
+m = 1E-6;
 
 def f(x,k):
     res = np.cos(k*x)/(4*np.pi*np.sqrt(m**2+2*(1-np.cos(x))));
@@ -50,13 +50,13 @@ for i in range(R):
     P[j,i] = P[i,j];  
 
 S = [];   
-rini = 20;
+rini = 2;
 for r in range(rini,R):
   Xv = X[0:r,0:r];
   Pv = P[0:r,0:r];
   Cv = Msqrt(np.dot(Xv,Pv));
   d1 = LA.eigvals(Cv+0.5*np.eye(len(Cv)));
-  d2 = LA.eigvals(Cv-0.4999999*np.eye(len(Cv)));
+  d2 = LA.eigvals(Cv-0.49999999*np.eye(len(Cv)));
   S.append(np.real(np.dot(d1,np.log(d1))-np.dot(d2,np.log(d2))));
 
 C = [];
